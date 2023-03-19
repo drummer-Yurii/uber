@@ -84,6 +84,9 @@ const latLng = ref({
 })
 
 onMounted(() => {
+  if (!direction.pickup || !direction.destination) {
+    router.push('/')
+  }
   setTimeout(() => {
     initMap();
   }, 50)
