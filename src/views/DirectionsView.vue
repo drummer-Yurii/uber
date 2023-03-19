@@ -14,37 +14,34 @@
       <div class="col-span-10 pr-4">
         <div class="w-full h-5"></div>
         <div class="mb-2 mt-5">
-          <AutoCompleteInput 
-            theId="firstInput"
-            v-model:input="pickup"
-            placeholder="Enter pick-up location"
-            @isActive="isPickupActive = true"
-          />
+          <AutoCompleteInput theId="firstInput" v-model:input="pickup" placeholder="Enter pick-up location"
+            @isActive="isPickupActive = true" />
         </div>
         <div class="mb-3">
-          <AutoCompleteInput 
-            theId="secondInput"
-            v-model:input="destination"
-            placeholder="Where to?"
-            @isActive="isPickupActive = false"
-          />
+          <AutoCompleteInput theId="secondInput" v-model:input="destination" placeholder="Where to?"
+            @isActive="isPickupActive = false" />
         </div>
       </div>
     </div>
-    <div class="flex items-center custom-border-bottom">
-      <div class="bg-gray-400 mx-5 my-3.5 p-1.5 rounded-full">
-        <MapMarkerIcon :size="30" fillColor="#f5f5f5" />
-      </div>
-      <div>
-        <div class="text-lg text-gray-600">London, UK</div>
-        <div class="text-lg text-gray-400">UK</div>
+    <div v-for="address in addressData" :key="address">
+      <div class="flex items-center custom-border-bottom">
+        <div class="bg-gray-400 mx-5 my-3.5 p-1.5 rounded-full">
+          <MapMarkerIcon :size="30" fillColor="#f5f5f5" />
+        </div>
+        <div>
+          <div class="text-lg text-gray-600">{{ address.description }}</div>
+          <div class="text-lg text-gray-400">{{ address.terms[2].value }}</div>
+        </div>
       </div>
     </div>
+
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
+import { debounce } from 'lodash';
+import axios from 'axios';
 import AutoCompleteInput from '@/components/AutoCompleteInput.vue';
 import ArrowIcon from 'vue-material-design-icons/ArrowLeft.vue';
 import MapMarkerIcon from 'vue-material-design-icons/MapMarker.vue';
@@ -53,6 +50,37 @@ let isPickupActive = ref(true);
 
 let pickup = ref('');
 let destination = ref('');
+let addressData = ref('');
+
+onMounted(() => {
+  document.getElementById('firstInput').focus()
+});
+
+const storeAddress = (address) => {
+  if (isPickupActive.value) {
+    
+  }
+}
+
+const findAddress = debounce(async (address) => {
+  if (
+    address === null ||
+    address === 'null' ||
+    address === ''
+  ) {
+    addressData.value = ''
+    return ''
+  }
+
+  try {
+    let res = await axios.get('address/' + address)
+    addressData.value = res.data
+  } catch (err) {
+    console.log(err);
+  }
+}, 300)
+watch(pickup, async (pickup) => await findAddress(pickup))
+watch(destination, async (destination) => await findAddress(destination))
 </script>
 
 <style lang="scss" scoped>
@@ -60,6 +88,7 @@ let destination = ref('');
   .bg-custom-color {
     background-color: rgb(237, 237, 237);
   }
+
   .circle-black {
     margin: 0 auto;
     width: 9px;
@@ -67,6 +96,7 @@ let destination = ref('');
     background-color: black;
     border-radius: 100%;
   }
+
   .circle-gray {
     margin: 0 auto;
     width: 9px;
@@ -74,24 +104,28 @@ let destination = ref('');
     background-color: rgb(191, 191, 191);
     border-radius: 100%;
   }
+
   .square-black {
     margin: 0 auto;
     width: 9px;
     height: 9px;
     background-color: black;
   }
+
   .square-gray {
     margin: 0 auto;
     width: 9px;
     height: 9px;
     background-color: rgb(191, 191, 191);
   }
+
   .line {
     margin: 0 auto;
     width: 2px;
     height: 45px;
     background-color: rgb(191, 191, 191);
   }
+
   .custom-border-bottom {
     border-bottom: 1px solid rgb(230, 230, 230);
   }
