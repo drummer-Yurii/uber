@@ -1,5 +1,12 @@
 <template>
   <div id="MapView">
+    <div 
+      id="BackBtn" 
+      class="absolute z-50 rounded-full bg-white p-1 top-8 left-4"
+      @click="goBack()"
+    >
+      <ArrowLeftIcon :size="40" />
+    </div>
     <div id="map"></div>
     <div id="VehicleSelection" class="w-full">
       <div class="w-full h-2 border-t"></div>
@@ -54,10 +61,13 @@
 
 <script setup>
 import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import axios from 'axios';
 import { useDirectionStore } from '@/store/direction-store';
+import ArrowLeftIcon from 'vue-material-design-icons/ArrowLeft.vue';
 
 const direction = useDirectionStore();
+const router = useRouter();
 
 const distance = ref({ text: '', value: null });
 const duration = ref({ text: '', value: null });
@@ -77,7 +87,13 @@ onMounted(() => {
   setTimeout(() => {
     initMap();
   }, 50)
-})
+});
+
+const goBack = () => {
+  router.push('/directions')
+  direction.pickup = ''
+  direction.destination = ''
+}
 
 const initMap = () => {
   const directionsService = new window.google.maps.DirectionService()
