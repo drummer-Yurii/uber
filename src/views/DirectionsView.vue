@@ -15,16 +15,19 @@
         <div class="w-full h-5"></div>
         <div class="mb-2 mt-5">
           <AutoCompleteInput theId="firstInput" v-model:input="pickup" placeholder="Enter pick-up location"
-            @isActive="isPickupActive = true" />
+            @clearInput="clearInputFunc('firstInput')"  @isActive="isPickupActive = true" />
         </div>
         <div class="mb-3">
           <AutoCompleteInput theId="secondInput" v-model:input="destination" placeholder="Where to?"
-            @isActive="isPickupActive = false" />
+            @clearInput="clearInputFunc('secondInput')" @isActive="isPickupActive = false" />
         </div>
       </div>
     </div>
     <div v-for="address in addressData" :key="address">
-      <div class="flex items-center custom-border-bottom">
+      <div 
+        @click="storeAddress(address.description)"
+        class="flex items-center custom-border-bottom"
+      >
         <div class="bg-gray-400 mx-5 my-3.5 p-1.5 rounded-full">
           <MapMarkerIcon :size="30" fillColor="#f5f5f5" />
         </div>
@@ -41,10 +44,15 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue';
 import { debounce } from 'lodash';
+import { useRouter } from 'vue-router';
+import { useDirectionStore } from '@/store/direction-store';
 import axios from 'axios';
 import AutoCompleteInput from '@/components/AutoCompleteInput.vue';
 import ArrowIcon from 'vue-material-design-icons/ArrowLeft.vue';
 import MapMarkerIcon from 'vue-material-design-icons/MapMarker.vue';
+
+const direction = useDirectionStore();
+const router = useRouter();
 
 let isPickupActive = ref(true);
 
@@ -56,9 +64,28 @@ onMounted(() => {
   document.getElementById('firstInput').focus()
 });
 
+const clearInputFunc = (inputId) => {
+  if (inputId === 'firstInput') {
+    pickup.value = ''
+    direction.pickup = ''
+  }
+  if (inputId === 'secondInput') {
+    destination.value = ''
+    direction.destination = ''
+  }
+}
+
 const storeAddress = (address) => {
   if (isPickupActive.value) {
-    
+    direction.pickup = address
+    pickup.value = address
+    addressData.value = ''
+  } else {
+    direction.destination = address
+    destination.value = address
+  }
+  if (direction.pickup.length > 0 && direction.destination.length > 0) {
+    router.push('/map')
   }
 }
 
