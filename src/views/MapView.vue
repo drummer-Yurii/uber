@@ -13,7 +13,7 @@
             <div class="w-full ml-3">
               <div class="flex items-center justify-between">
                 <div class="text-2xl mb-1">UberX</div>
-                <div class="text-xl">{{ distance.value }}</div>
+                <div class="text-xl">${{ calculatePrice(1, distance.value) }}</div>
               </div>
               <div class="text-gray-500">{{ duration.text }}</div>
             </div>
@@ -24,8 +24,8 @@
             <img width="75" src="img/uber/comfort.png" alt="">
             <div class="w-full ml-3">
               <div class="flex items-center justify-between">
-                <div class="text-2xl mb-1">UberX</div>
-                <div class="text-xl">{{ distance.value }}</div>
+                <div class="text-2xl mb-1">Comfort</div>
+                <div class="text-xl">${{ calculatePrice(1.25, distance.value) }}</div>
               </div>
               <div class="text-gray-500">{{ duration.text }}</div>
             </div>
@@ -36,8 +36,8 @@
           <img width="75" src="img/uber/uberxl.png" alt="">
           <div class="w-full ml-3">
             <div class="flex items-center justify-between">
-              <div class="text-2xl mb-1">UberX</div>
-              <div class="text-xl">{{ distance.value }}</div>
+              <div class="text-2xl mb-1">UberXL</div>
+              <div class="text-xl">${{ calculatePrice(1.5, distance.value) }}</div>
             </div>
             <div class="text-gray-500">{{ duration.text }}</div>
           </div>
@@ -132,6 +132,11 @@ const getDistance = async () => {
   distance.value.value = res.data.rows[0].elements[0].distance.value
   duration.value.text = res.data.rows[0].elements[0].duration.text
   duration.value.value = res.data.rows[0].elements[0].duration.value
+}
+
+const calculatePrice = (multiplier, price) => {
+  let res = (price/900) * multiplier
+  return res.toFixed(2)
 }
 
 </script>
